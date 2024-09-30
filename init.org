@@ -1,0 +1,884 @@
+
+#+TITLE: Init
+#+DESCRIPTION: A Post-installation script for my emacs init.el
+#+AUTHOR: Tolemariam Fufa Teso
+#+PROPERTY: header-args :tangle ~/.emacs.d/init.el
+#+auto_tangle: t
+#+STARTUP: showeverything
+
+* Init.el Configuratation :toc:
+
+* Emacs layout
+#+begin_src emacs-lisp 
+
+
+    ;;(push '(fullscreen . maximized) default-frame-alist)
+    (setq lexical-binding t)
+    (setq byte-compile-mode t)
+    (setq initial-scratch-message nil)
+    (setq inhibit-startup-message t)
+    ;;
+
+    (if window-system
+        (tool-bar-mode -1)
+      )
+    ;;
+    (scroll-bar-mode -1)        ; Disable visible scrollbar
+    (tool-bar-mode -1)          ; Disable the toolbar
+    (tooltip-mode -1)           ; Disable tooltips
+    (set-fringe-mode 10)        ; Give some breathing room
+  ;;
+    (menu-bar-mode -1)            ; Disable the menu bar
+    ;;Set up the visible bell
+    (setq visible-bell t)
+    ;;
+    (defun fontify-frame (frame)
+      (set-frame-parameter frame 'font "Monospace-11"))
+    ;;
+    ;; Fontify current fram
+    (fontify-frame nil)
+    ;; Fontify any future frames
+    (push 'fontify-frame after-make-frame-functions) 
+    ;;
+    (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+    
+#+end_src
+
+* Initialize package sources
+#+begin_src emacs-lisp 
+
+
+    (require 'package)
+    (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                             ("elpa" . "https://elpa.gnu.org/packages/")))
+    ;;
+    (package-initialize)
+    ;; Bootstrap 'use-package'
+    (eval-after-load 'gnutls
+      '(add-to-list 'gnutls-trustfiles "/etc/ssl/cert.pem"))
+    (unless (package-installed-p 'use-package)
+      (package-refresh-contents)
+      (package-install 'use-package))
+    (eval-when-compile
+      (require 'use-package))
+    (require 'bind-key)
+    (setq use-package-always-ensure t)
+    ;;
+    ;; Initialize use-package on non-Linux platforms
+    (unless (package-installed-p 'use-package)
+      (package-install 'use-package))
+
+    (require 'use-package)
+    (setq use-package-always-ensure t)
+    ;;
+    (dolist (mode '(org-mode-hook
+                    term-mode-hook
+                    vterm-mode-hook
+                    shell-mode-hook
+                    eshell-mode-hook))
+      (add-hook mode (lambda () (display-line-numbers-mode 0))))
+    (use-package command-log-mode)
+    #+end_src
+
+* Ivy
+#+begin_src emacs-lisp 
+
+
+    (use-package ivy
+      :diminish
+      :bind (("C-s" . swiper)
+             :map ivy-minibuffer-map
+             ("TAB" . ivy-alt-done)	
+             ("C-l" . ivy-alt-done)
+             ("C-j" . ivy-next-line)
+             ("C-k" . ivy-previous-line)
+             :map ivy-switch-buffer-map
+             ("C-k" . ivy-previous-line)
+             ("C-l" . ivy-done)
+             ("C-d" . ivy-switch-buffer-kill)
+             :map ivy-reverse-i-search-map
+             ("C-k" . ivy-previous-line)
+             ("C-d" . ivy-reverse-i-search-kill))
+      :config
+      (ivy-mode 1))
+    (use-package all-the-icons)
+    (use-package ivy-rich
+      :init
+      (ivy-rich-mode 1))
+      #+end_src
+
+* Counsel
+#+begin_src emacs-lisp 
+
+
+    (use-package counsel
+      :bind (("M-x" . counsel-M-x)
+             ("C-x b" . counsel-ibuffer)
+             ("C-x C-f" . counsel-find-file)
+             :map minibuffer-local-map
+             ("C-r" . 'counsel-minibuffer-history)))
+             #+end_src
+
+* Doom-modeline
+#+begin_src emacs-lisp 
+
+
+    (use-package doom-modeline
+      :ensure t
+      :init (doom-modeline-mode 1)
+      :custom ((doom-modeline-height 15)))
+    ;;
+                                            ; NOTE: Make sure to configure a GitHub token before using this package!
+    ;; https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+    ;; https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
+    #+end_src
+
+* Forge
+#+begin_src emacs-lisp 
+
+
+    (use-package forge)
+    ;;
+    (defun efs/org-mode-setup ()
+      (org-indent-mode)
+      (variable-pitch-mode 1)
+      (visual-line-mode 1))
+      #+end_src
+
+* Helpful
+#+begin_src emacs-lisp 
+
+
+    (use-package helpful
+      :ensure t
+      :custom
+      (counsel-describe-function-function #'helpful-callable)
+      (counsel-describe-variable-function #'helpful-variable)
+      :bind
+      ([remap describe-function] . counsel-describe-function)
+      ([remap describe-command] . helpful-command)
+      ([remap describe-variable] . counsel-describe-variable)
+      ([remap describe-key] . helpful-key))
+      #+end_src
+
+* General
+#+begin_src emacs-lisp 
+
+
+    (use-package general
+      :after evil
+      :config
+      (general-create-definer efs/leader-keys
+        :keymaps '(normal insert visual emacs)
+        :prefix "SPC"
+        :global-prefix "C-SPC")
+
+      (efs/leader-keys
+        "t"  '(:ignore t :which-key "toggles")
+        "tt" '(counsel-load-theme :which-key "choose theme")
+        "fde" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/Emacs.org")))))
+    #+end_src
+
+* Hydra
+#+begin_src emacs-lisp 
+
+
+    (use-package hydra)
+
+    (defhydra hydra-text-scale (:timeout 4)
+      "scale text"
+      ("j" text-scale-increase "in")
+      ("k" text-scale-decrease "out")
+      ("f" nil "finished" :exit t))
+    ;;
+    ;;
+    (add-to-list 'display-buffer-alist
+                 '("\*vterm\*"
+                   (display-buffer-in-side-window)
+                   (window-height . 0.25)
+                   (side . bottom)
+                   (slot . 0)))
+
+    #+end_src
+
+* Eshell
+#+begin_src emacs-lisp 
+
+    (defun efs/configure-eshell ()
+      ;; Save command history when commands are entered
+      (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+
+      ;; Truncate buffer for performance
+      (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+      ;; Bind some useful keys for evil-mode
+      (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+      (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
+      (evil-normalize-keymaps)
+
+      (setq eshell-history-size         10000
+            eshell-buffer-maximum-lines 10000
+            eshell-hist-ignoredups t
+            eshell-scroll-to-bottom-on-input t))
+
+    (use-package eshell-git-prompt
+      :after eshell)
+
+    (use-package eshell
+      :hook (eshell-first-time-mode . efs/configure-eshell)
+      :config
+
+      (with-eval-after-load 'esh-opt
+        (setq eshell-destroy-buffer-when-process-dies t)
+        (setq eshell-visual-commands '("htop" "zsh" "vim")))
+
+      (eshell-git-prompt-use-theme 'powerline))
+    #+end_src
+
+* Dired
+#+begin_src emacs-lisp 
+
+    (use-package dired
+      :ensure nil
+      :commands (dired dired-jump)
+      :bind (("C-x C-j" . dired-jump))
+      :custom ((dired-listing-switches "-agho --group-directories-first")))
+      #+end_src
+
+** Dired-single
+#+begin_src emacs-lisp 
+
+
+    (use-package dired-single)
+    ;;
+    (use-package all-the-icons-dired
+      :hook (dired-mode . all-the-icons-dired-mode))
+      #+end_src
+
+** Dired-open
+#+begin_src emacs-lisp 
+
+
+    (use-package dired-open
+      :config
+      ;; Doesn't work as expected!
+      ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
+      (setq dired-open-extensions '(("png" . "feh")
+                                    ("mkv" . "mpv"))))
+                                    #+end_src
+
+** Dired-hide-dotfiles
+#+begin_src emacs-lisp 
+
+
+    (use-package dired-hide-dotfiles
+      :hook (dired-mode . dired-hide-dotfiles-mode)
+      :config
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "H" 'dired-hide-dotfiles-mode))
+        #+end_src
+
+* Magit
+#+begin_src emacs-lisp 
+
+
+    (use-package magit
+      :commands magit-status
+      :custom
+      (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+      #+end_src
+
+* Forge
+#+begin_src emacs-lisp 
+
+
+    (use-package forge
+      :after magit)
+      #+end_src
+
+* Rainbow-delimiters
+#+begin_src emacs-lisp 
+
+
+    (use-package rainbow-delimiters
+      :hook (prog-mode . rainbow-delimiters-mode))
+      #+end_src
+
+* which-key
+#+begin_src emacs-lisp 
+
+
+    (use-package which-key
+      :init (which-key-mode)
+      :diminish which-key-mode
+      :config
+      (setq which-key-idle-delay 0))
+      #+end_src
+
+* Lsp-mode
+#+begin_src emacs-lisp 
+
+
+    (use-package lsp-mode
+      :commands (lsp lsp-deferred)
+      :hook (lsp-mode . efs/lsp-mode-setup)
+      :init
+      (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+      :config
+      (lsp-enable-which-key-integration t))
+    ;;
+
+    (use-package lsp-ui
+      :hook (lsp-mode . lsp-ui-mode)
+      :custom
+      (lsp-ui-doc-position 'bottom))
+
+    (use-package lsp-treemacs
+      :after lsp)
+
+
+    (use-package lsp-ivy)
+    #+end_src
+
+* Typescript-mode
+#+begin_src emacs-lisp 
+
+
+    (use-package typescript-mode
+      :mode "\\.ts\\'"
+      :hook (typescript-mode . lsp-deferred)
+      :config
+      (setq typescript-indent-level 2))
+      #+end_src
+
+* Company
+#+begin_src emacs-lisp 
+
+    (use-package company
+      :after lsp-mode
+      :hook (lsp-mode . company-mode)
+      :bind (:map company-active-map
+                  ("<tab>" . company-complete-selection))
+      (:map lsp-mode-map
+            ("<tab>" . company-indent-or-complete-common))
+      :custom
+      (company-minimum-prefix-length 1)
+      (company-idle-delay 0.0))
+
+    (use-package company-box
+      :hook (company-mode . company-box-mode))
+    #+end_src
+
+* Evil
+#+begin_src emacs-lisp 
+
+    (use-package evil  
+      :ensure t
+      :init
+      (setq evil-want-integration t)
+      (setq evil-want-keybinding nil)
+      (setq evil-want-C-u-scroll t)
+      (setq evil-want-C-i-jump nil)
+      :config
+      (evil-mode 1)
+      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+      (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-cha-and-join)
+      ;; Use visual line motions even outside of visual-line-mode buffers
+      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+      (evil-set-initial-state 'messages-buffer-mode 'normal)
+      (evil-set-initial-state 'dashboard-mode 'normal))
+      #+end_src
+
+
+* Evil-collection
+#+begin_src emacs-lisp 
+
+    (use-package evil-collection
+      :after evil
+      :ensure t
+      :config
+      ;;(set)
+      (evil-collection-init)
+      (defvar forge-add-default-bindings t))
+      #+end_src
+
+* Rust-ts-mode
+#+begin_src emacs-lisp 
+
+    (use-package rust-ts-mode
+      :hook ((rust-ts-mode . eglot-ensure)
+             (rust-ts-mode . company-mode))
+      :mode (("\\.rs\\'" . rust-ts-mode))
+      :config
+      (add-to-list 'exec-path "/home/brent/.cargo/bin")
+      (setenv "PATH" (concat (getenv "PATH") ":/home/to/.cargo/bin")))
+    #+end_src
+
+* Python-mode
+#+begin_src emacs-lisp 
+
+    (use-package python-mode
+      :ensure t
+      :hook (python-mode . lsp-deferred)
+      :custom
+      ;; NOTE: Set these if Python 3 is called "python3" on your system!
+      ;; (python-shell-interpreter "python3")
+      ;; (dap-python-executable "python3")
+      (dap-python-debugger 'debugpy)
+      :config
+      (require 'dap-python))
+    #+end_src
+
+* Pyvenv
+#+begin_src emacs-lisp 
+
+    (use-package pyvenv
+      :config
+      (pyvenv-mode 1))
+    #+end_src
+
+* Python
+#+begin_src emacs-lisp 
+
+    (use-package python
+      :bind (:map python-ts-mode-map
+                  ("<f5>" . recompile)
+                  ("<f6>" . eglot-format))
+      :hook ((python-ts-mode . eglot-ensure)
+             (python-ts-mode . company-mode))
+      :mode (("\\.py\\'" . python-ts-mode)))
+    #+end_src
+
+* Eglot
+#+begin_src emacs-lisp 
+
+    (use-package eglot
+      :bind (:map eglot-mode-map
+                  ("C-c d" . eldoc)
+                  ("C-c a" . eglot-code-actions)
+                  ("C-c f" . flymake-show-buffer-diagnostics)
+                  ("C-c r" . eglot-rename)))
+
+    ;;(desktop-save-mode 1)
+    #+end_src
+
+* Conda
+#+begin_src emacs-lisp 
+
+    (use-package conda
+      :ensure t
+      :config
+      (setq conda-env-home-directory
+            (expand-file-name "~/miniconda3")))
+            #+end_src
+
+* Highlight-indent-guides
+#+begin_src emacs-lisp 
+
+    (use-package highlight-indent-guides
+      :ensure t
+      :hook (python-ts-mode . highlight-indent-guides-mode)
+      :config
+      (set-face-foreground 'highlight-indent-guides-character-face "white")
+      (setq highlight-indent-guides-method 'character))
+    ;;
+    (add-hook 'html-mode-hook #'(lambda nil (setq sgml-xml-mode t)))
+    #+end_src
+
+    
+* Yasnippet
+#+begin_src emacs-lisp 
+
+    (add-to-list 'load-path
+                 "~/.emacs.d/plugins/yasnippet")
+    (require 'yasnippet)
+    (yas-global-mode 1)
+    (add-hook 'yas-minor-mode-hook (lambda ()
+                                     (yas-activate-extra-mode 'fundamental-mode)))
+   #+end_src
+
+* Treesit-auto
+#+begin_src emacs-lisp 
+
+    (use-package treesit-auto
+      :custom
+      (treesit-auto-install 'prompt)
+      :config
+      (setq treesit-auto-langs '(javascript typescript tsx css html))
+      (treesit-auto-add-to-auto-mode-alist '(javascript typescript tsx css html))
+      (global-treesit-auto-mode))
+      #+end_src
+
+* Flycheck
+#+begin_src emacs-lisp 
+
+    (use-package flycheck
+      :hook (lsp-mode . flycheck-mode)
+      :bind (:map flycheck-mode-map
+                  ("M-n" . flycheck-previous-error)
+                  ("M-p" . flycheck-next-error))
+      :custom (flycheck-display-errors-delay .3))
+      #+end_src
+
+* Corfu package
+#+begin_src emacs-lisp 
+
+    (use-package corfu
+      :custom
+      (corfu-cycle t)
+      (corfu-auto t)
+      (corfu-auto-prefix 2)
+      (corfu-auto-delay 0)
+      (corfu-popupinfo-delay '(0.5 . 0.2))
+      (corfu-preview-current 'insert)
+      (corfu-preselect 'prompt)
+      (corfu-on-exact-match nil)
+      :bind (:map corfu-map
+                  ("TAB"        . corfu-next)
+                  ([tab]        . corfu-next)
+                  ("S-TAB"      . corfu-previous)
+                  ([backtab]    . corfu-previous)
+                  ("S-<return>" . corfu-insert)
+                  ("RET"        . corfu-insert))
+      :init
+      (global-corfu-mode)
+      (corfu-history-mode))
+    #+end_src
+
+** Add icons to the pop-up window
+#+begin_src emacs-lisp 
+    (use-package nerd-icons-corfu
+      :after corfu
+      :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+      #+end_src
+
+* Apheleia
+#+begin_src emacs-lisp 
+
+    (use-package apheleia
+      :hook (prog-mode . apheleia-mode)
+      :config
+      (setf (alist-get 'prettier apheleia-formatters)
+            '("prettier" "--stdin-filepath" filepath)))
+    #+end_src
+
+* Transparency
+#+begin_src emacs-lisp 
+
+    (set-frame-parameter nil 'alpha '(90 . 75))
+    (add-to-list 'default-frame-alist '(alpha . (90 . 75)))
+    #+end_src
+
+* General
+#+begin_src emacs-lisp 
+
+    (global-display-line-numbers-mode)
+    (delete-selection-mode t)
+    (setq auto-save-default nil)
+    (setq make-backup-files nil)
+    (setq create-lockfiles nil)
+    #+end_src
+
+* Python-django
+#+begin_src emacs-lisp 
+
+    (use-package python-django
+      :ensure t )
+    #+end_src
+
+* General Package
+** Built in Project Package
+#+begin_src emacs-lisp 
+
+    (require 'project)
+    #+end_src
+
+* Projectile
+#+begin_src emacs-lisp 
+
+    (use-package projectile
+      :diminish projectile-mode
+      :config (projectile-mode)
+      :custom ((projectile-completion-system 'ivy))
+      :bind-keymap
+      ("C-c p" . projectile-command-map)
+      :init
+      ;; NOTE: Set this to the folder where you keep your Git repos!
+      (when (file-directory-p "~/Projects/Code")
+        (setq projectile-project-search-path '("~/Projects/Code")))
+      (setq projectile-switch-project-action #'projectile-dired))
+
+    (use-package counsel-projectile
+      :config (counsel-projectile-mode))
+      #+end_src
+
+* Perspective
+#+begin_src emacs-lisp 
+    (use-package perspective
+      :bind
+      ("C-x C-b" . persp-list-buffers)         ; or use a nicer switcher, see below
+      :custom
+      (persp-mode-prefix-key (kbd "C-x x"))  ; pick your own prefix key here
+      :init
+      (persp-mode))
+#+end_src
+
+* Vertico
+#+begin_src emacs-lisp 
+
+
+    (use-package vertico
+      :ensure t
+      :config
+      (vertico-mode))
+      #+end_src
+
+* Marginalia
+#+begin_src emacs-lisp 
+
+
+    (use-package marginalia
+      :ensure t
+      :config
+      (marginalia-mode))
+       
+#+end_src
+
+
+* Embark package
+#+begin_src emacs-lisp 
+
+
+    (use-package embark
+      :ensure t
+
+      :bind
+      (("C-." . embark-act)         ;; pick some comfortable binding
+       ("C-M" . embark-dwim)        ;; good alternative: M-.
+       ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+      :init
+
+      ;; Optionally replace the key help with a completing-read interface
+      (setq prefix-help-command #'embark-prefix-help-command)
+
+      :config
+
+      ;; Hide the mode line of the Embark live/completions buffers
+      (add-to-list 'display-buffer-alist
+                   '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                     nil
+                     (window-parameters (mode-line-format . none)))))
+
+#+end_src
+
+
+* Embark-consult package.
+#+begin_src emacs-lisp 
+
+    (use-package embark-consult
+      :ensure t
+      :after (embark consult)
+      :demand t 
+      :hook
+      (embark-collect-mode . consult-preview-at-point-mode))
+       
+
+#+end_src
+
+* Orderless
+#+begin_src emacs-lisp 
+
+    (use-package orderless
+      :init
+      (setq completion-styles '(orderless)))
+       
+
+#+end_src
+
+* Consult
+#+begin_src emacs-lisp 
+
+
+    (use-package consult
+      :general
+      ("M-y" 'consult-yank-from-kill-ring
+       "C-x b" 'consult-buffer))
+        
+
+#+end_src
+
+* Register
+#+begin_src emacs-lisp 
+
+    (set-register ?c (cons 'file "~/org/Registers/code_notes.org"))
+    (set-register ?i (cons 'file "~/org/Registers/ideas.org"))
+    (set-register ?k (cons 'file "~/org/Registers/keybindings.org"))
+    (set-register ?l (cons 'file "~/org/Registers/life.org"))
+   
+#+end_src
+
+
+* Avy config
+#+begin_src emacs-lisp 
+
+
+    (use-package avy
+      :ensure t)
+    (require 'avy)
+    
+#+end_src
+
+
+* Causal-avy
+#+begin_src emacs-lisp 
+
+
+    (use-package casual-avy
+      :ensure t
+      :bind ("M-g" . casual-avy-tmenu))
+       
+#+end_src
+
+
+* Evil-snipe config
+#+begin_src emacs-lisp 
+
+
+    (use-package evil-snipe
+      :ensure t)
+    (require 'evil-snipe)
+    ;;
+    (evil-snipe-mode +1)
+    (evil-snipe-override-mode +1)
+    ;; and disable in specific modes
+    (push 'python-mode evil-snipe-disabled-modes)
+    ;; Globally
+    (evil-snipe-override-mode 1)
+    ;; Or locally
+    (add-hook 'ruby-mode-hook 'evil-snipe-override-local-mode)
+    (add-hook 'python-mode-hook
+              (lambda ()
+                (make-variable-buffer-local 'evil-snipe-aliases)
+                (push '(?: "def .+:") evil-snipe-aliases)))
+    ;;
+    (evil-define-key 'visual evil-snipe-local-mode-map "z" 'evil-snipe-s)
+    (evil-define-key 'visual evil-snipe-local-mode-map "Z" 'evil-snipe-S)
+    ;;
+    (evil-define-key '(normal motion) evil-snipe-local-mode-map
+      "s" 'evil-snipe-s
+      "S" 'evil-snipe-S)
+
+    (evil-define-key 'operator evil-snipe-local-mode-map
+      "z" 'evil-snipe-s
+      "Z" 'evil-snipe-S
+      "x" 'evil-snipe-x
+      "X" 'evil-snipe-X)
+
+    (evil-define-key 'motion evil-snipe-override-local-mode-map
+      "f" 'evil-snipe-f
+      "F" 'evil-snipe-F
+      "t" 'evil-snipe-t
+      "T" 'evil-snipe-T)
+
+    (when evil-snipe-override-evil-repeat-keys
+      (evil-define-key 'motion map
+        ";" 'evil-snipe-repeat
+        "," 'evil-snipe-repeat-reverse))
+
+#+end_src
+* Auctex config
+#+begin_src emacs-lisp 
+
+
+    (use-package auctex
+      :ensure t
+      :defer t
+      :hook (LaTeX-mode . (lambda ()
+                            (push (list 'output-pdf "Zathura")
+                                  TeX-view-program-selection))))
+    ;;(add-hook 'doc-view-mode-hook 'auto-revert-mode)
+    
+#+end_src
+
+
+* Dashboard
+#+begin_src emacs-lisp 
+
+
+    (setq dashboard-file "~/.emacs.d/dashboard.el")
+    (load dashboard-file)
+     
+#+end_src
+
+
+* Org-mime
+#+begin_src emacs-lisp 
+
+    (use-package org-mime
+      :ensure t)
+    ;;
+    (mapcar (lambda (hooksym)
+              (add-hook hooksym
+                        (lambda ()
+                          (local-set-key  (kbd "C-m") 'newline-and-indent)
+                          )))
+            '(
+              clojure-mode-hook
+              emacs-lisp-mode-hook
+              erlang-mode-hook
+              java-mode-hook
+              js-mode-hook
+              lisp-interaction-mode-hook
+              lisp-mode-hook
+              makefile-mode-hook
+              nxml-mode-hook
+              python-mode-hook
+              ruby-mode-hook
+              scheme-mode-hook
+              sh-mode-hook
+              ))  
+
+
+
+
+#+end_src
+
+* Multiple-cursors
+#+begin_src emacs-lisp 
+
+    (require 'multiple-cursors)
+    (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+    (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+    (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+    (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+    ;;
+    (global-unset-key (kbd "M-<down-mouse-1>"))
+    (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click)
+    
+#+end_src
+
+* Custom file
+#+begin_src emacs-lisp 
+
+
+    (setq custom-file "~/.emacs.d/custom.el")
+    (load custom-file)
+
+    (setq inhibit-startup-echo-area-message "to")
+    (setq inhibit-startup-message t)
+    ;;
+  
+
+#+end_src
+
+* Load config files
+#+begin_src emacs-lisp
+
+    (load "~/.emacs.d/org-config.el")
+    (load "~/.emacs.d/themes.el")
+
+#+end_src
+

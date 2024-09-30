@@ -1,0 +1,27 @@
+#+TITLE: custom
+#+DESCRIPTION: A Post-installation script for my emacs custom
+#+AUTHOR: Tolemariam Fufa Teso
+#+PROPERTY: header-args :tangle ~/.emacs.d/custom.el
+#+auto_tangle: t
+#+STARTUP: showeverything
+
+* Custom Configuratation :toc:
+#+begin_src emacs-lisp
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(custom-safe-themes
+     '("32f22d075269daabc5e661299ca9a08716aa8cda7e85310b9625c434041916af" "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "014cb63097fc7dbda3edf53eb09802237961cbb4c9e9abd705f23b86511b0a69" "603a831e0f2e466480cdc633ba37a0b1ae3c3e9a4e90183833bc4def3421a961" default))
+   '(org-agenda-files '("/home/to/org/Work.org"))
+   '(package-selected-packages
+     '(org-auto-tangle consult-denote denote ef-themes maruo-macro-mode which-key-posframe purple-haze-theme rebecca-theme zenburn-theme makefile-executor evil-multiedit evil-snipe org-mime org-mine doom-themes perspective org-modern orderless marginalia vertico consult-flycheck nerd-icons-completion treemacs-nerd-icons all-the-icons-nerd-fonts zuul org-bullets evil-magit counsel-projectile python-django flycheck-mypy vterm-toggle shell-pop modus-themes apheleia nerd-icons-corfu corfu flycheck treesit-auto neotree django-mode yasnippet-snippets django-snippets emmet-mode highlight-indent-guides conda forge doom-modeline ivy-rich dracula-theme counsel command-log-mode all-the-icons)))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+
+#+end_src

@@ -1,0 +1,33 @@
+#+TITLE: dashboard
+#+DESCRIPTION: A Post-installation script for my emacs dashboard
+#+AUTHOR: Tolemariam Fufa Teso
+#+PROPERTY: header-args :tangle ~/.emacs.d/dashboard.el
+#+auto_tangle: t
+#+STARTUP: showeverything
+
+* Dashboard Configuratation :toc:
+#+begin_src emacs-lisp
+    (use-package dashboard
+      :ensure t
+      :config
+      :init
+      (progn
+        (setq dashboard-items '((agenda . 3)))
+        ;;(recents . 2)))
+        ;;(projects . 2)
+        ;;(bookmarks . 2)
+        ;;(registers . 1)))
+        (setq dashboard-show-shortcuts nil)
+        (setq dashboard-center-content t)
+        (setq dashboard-banner-logo-title "Welcome!")
+        (setq dashboard-set-file-icons t)
+        (setq dashboard-set-heading-icons t)
+        ;;(setq dashboard-startup-banner "")
+        (setq dashboard-set-navigator t)
+        (setq dashboard-vertically-center-content t))
+      (dashboard-setup-startup-hook))
+  ;;
+  ;;
+#+end_src
+
+
