@@ -26,8 +26,6 @@
         (setq dashboard-set-navigator t)
         (setq dashboard-vertically-center-content t))
       (dashboard-setup-startup-hook))
-  ;;
-  ;;
-#+end_src
+ #+end_src
 
 
