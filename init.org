@@ -11,7 +11,6 @@
 * Emacs layout
 #+begin_src emacs-lisp 
 
-
     ;;(push '(fullscreen . maximized) default-frame-alist)
     (setq lexical-binding t)
     (setq byte-compile-mode t)
@@ -46,7 +45,6 @@
 
 * Initialize package sources
 #+begin_src emacs-lisp 
-
 
     (require 'package)
     (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -110,7 +108,6 @@
 * Counsel
 #+begin_src emacs-lisp 
 
-
     (use-package counsel
       :bind (("M-x" . counsel-M-x)
              ("C-x b" . counsel-ibuffer)
@@ -122,7 +119,6 @@
 * Doom-modeline
 #+begin_src emacs-lisp 
 
-
     (use-package doom-modeline
       :ensure t
       :init (doom-modeline-mode 1)
@@ -133,21 +129,8 @@
     ;; https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
     #+end_src
 
-* Forge
-#+begin_src emacs-lisp 
-
-
-    (use-package forge)
-    ;;
-    (defun efs/org-mode-setup ()
-      (org-indent-mode)
-      (variable-pitch-mode 1)
-      (visual-line-mode 1))
-      #+end_src
-
 * Helpful
 #+begin_src emacs-lisp 
-
 
     (use-package helpful
       :ensure t
@@ -181,7 +164,6 @@
 
 * Hydra
 #+begin_src emacs-lisp 
-
 
     (use-package hydra)
 
@@ -248,7 +230,6 @@
 ** Dired-single
 #+begin_src emacs-lisp 
 
-
     (use-package dired-single)
     ;;
     (use-package all-the-icons-dired
@@ -257,7 +238,6 @@
 
 ** Dired-open
 #+begin_src emacs-lisp 
-
 
     (use-package dired-open
       :config
@@ -270,7 +250,6 @@
 ** Dired-hide-dotfiles
 #+begin_src emacs-lisp 
 
-
     (use-package dired-hide-dotfiles
       :hook (dired-mode . dired-hide-dotfiles-mode)
       :config
@@ -281,7 +260,6 @@
 * Magit
 #+begin_src emacs-lisp 
 
-
     (use-package magit
       :commands magit-status
       :custom
@@ -291,14 +269,16 @@
 * Forge
 #+begin_src emacs-lisp 
 
-
-    (use-package forge
-      :after magit)
+  (use-package forge
+    :after magit)
+  (defun efs/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (visual-line-mode 1))
       #+end_src
 
 * Rainbow-delimiters
 #+begin_src emacs-lisp 
-
 
     (use-package rainbow-delimiters
       :hook (prog-mode . rainbow-delimiters-mode))
@@ -318,7 +298,6 @@
 * Lsp-mode
 #+begin_src emacs-lisp 
 
-
     (use-package lsp-mode
       :commands (lsp lsp-deferred)
       :hook (lsp-mode . efs/lsp-mode-setup)
@@ -326,7 +305,6 @@
       (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
       :config
       (lsp-enable-which-key-integration t))
-    ;;
 
     (use-package lsp-ui
       :hook (lsp-mode . lsp-ui-mode)
@@ -336,13 +314,11 @@
     (use-package lsp-treemacs
       :after lsp)
 
-
     (use-package lsp-ivy)
     #+end_src
 
 * Typescript-mode
 #+begin_src emacs-lisp 
-
 
     (use-package typescript-mode
       :mode "\\.ts\\'"
@@ -628,7 +604,6 @@
 * Vertico
 #+begin_src emacs-lisp 
 
-
     (use-package vertico
       :ensure t
       :config
@@ -685,7 +660,6 @@
       :hook
       (embark-collect-mode . consult-preview-at-point-mode))
        
-
 #+end_src
 
 * Orderless
@@ -695,19 +669,16 @@
       :init
       (setq completion-styles '(orderless)))
        
-
 #+end_src
 
 * Consult
 #+begin_src emacs-lisp 
-
 
     (use-package consult
       :general
       ("M-y" 'consult-yank-from-kill-ring
        "C-x b" 'consult-buffer))
         
-
 #+end_src
 
 * Register
@@ -724,7 +695,6 @@
 * Avy config
 #+begin_src emacs-lisp 
 
-
     (use-package avy
       :ensure t)
     (require 'avy)
@@ -734,7 +704,6 @@
 
 * Causal-avy
 #+begin_src emacs-lisp 
-
 
     (use-package casual-avy
       :ensure t
@@ -792,7 +761,6 @@
 * Auctex config
 #+begin_src emacs-lisp 
 
-
     (use-package auctex
       :ensure t
       :defer t
@@ -806,7 +774,6 @@
 
 * Dashboard
 #+begin_src emacs-lisp 
-
 
     (setq dashboard-file "~/.emacs.d/dashboard.el")
     (load dashboard-file)
@@ -841,9 +808,6 @@
               sh-mode-hook
               ))  
 
-
-
-
 #+end_src
 
 * Multiple-cursors
@@ -863,15 +827,12 @@
 * Custom file
 #+begin_src emacs-lisp 
 
-
     (setq custom-file "~/.emacs.d/custom.el")
     (load custom-file)
 
     (setq inhibit-startup-echo-area-message "to")
     (setq inhibit-startup-message t)
-    ;;
-  
-
+    
 #+end_src
 
 * Load config files
