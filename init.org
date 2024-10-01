@@ -16,6 +16,7 @@
     (setq byte-compile-mode t)
     (setq initial-scratch-message nil)
     (setq inhibit-startup-message t)
+   (setq inhibit-startup-echo-area-message "to")
     ;;
 
     (if window-system
@@ -40,7 +41,7 @@
     (push 'fontify-frame after-make-frame-functions) 
     ;;
     (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-    
+
 #+end_src
 
 * Initialize package sources
@@ -772,15 +773,6 @@
 #+end_src
 
 
-* Dashboard
-#+begin_src emacs-lisp 
-
-    (setq dashboard-file "~/.emacs.d/dashboard.el")
-    (load dashboard-file)
-     
-#+end_src
-
-
 * Org-mime
 #+begin_src emacs-lisp 
 
@@ -828,18 +820,19 @@
 #+begin_src emacs-lisp 
 
     (setq custom-file "~/.emacs.d/custom.el")
-    (load custom-file)
-
-    (setq inhibit-startup-echo-area-message "to")
-    (setq inhibit-startup-message t)
+    (load custom-file)   
     
 #+end_src
 
 * Load config files
 #+begin_src emacs-lisp
 
-    (load "~/.emacs.d/org-config.el")
-    (load "~/.emacs.d/themes.el")
+      (setq dashboard-file "~/.emacs.d/dashboard.el")
+      (load dashboard-file)
+
+      (load "~/.emacs.d/org-config.el")
+
+      (load "~/.emacs.d/themes.el")
 
 #+end_src
 
