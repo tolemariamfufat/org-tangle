@@ -148,7 +148,6 @@ Custom plugins may be added to $ZSH_CUSTOM/plugins/
 Add wisely, as too many plugins slow down shell startup.
 #+begin_src z shell
 
-
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
@@ -173,7 +172,6 @@ source $ZSH/oh-my-zsh.sh
 * Preferred editor for local and remote sessions
 #+begin_src z shell
 
-
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
@@ -197,17 +195,15 @@ For a full list of active aliases, run `alias`.
  Example aliases
  #+begin_src z shell
 
-
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias emacs="emacsclient -c -a 'emacs'"
 alias em="emacs -nw"
-alias z="zellij"
+alias ze="zellij"
 
 #+end_src
 * Gcom
 #+begin_src z shell
-
 
 gcom() {
 	git add .
@@ -261,7 +257,11 @@ unset __conda_setup
 * Neofetch
 #+begin_src z shell
 
-
 #neofetch
 
 #+end_src
+* Zoxide
+#+begin_src zsh 
+eval "$(zoxide init zsh)"
+#+end_src
+#

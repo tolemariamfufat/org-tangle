@@ -35,7 +35,7 @@
 * Default theme
 #+begin_src emacs-lisp
 
-(load-theme 'tsdh-dark t)
+;;(load-theme 'tsdh-dark t)
 #+end_src
 * Kaolin-themes
 #+begin_src emacs-lisp
