@@ -1,18 +1,28 @@
-#+TITLE: .zshrc
-#+DESCRIPTION: A Post-installation script for my .zshrc file
+#+TITLE: Config_fish
+#+DESCRIPTION: A Post-installation script for my config.fish file
 #+AUTHOR: Tolemariam Fufa Teso
-#+PROPERTY: header-args :tangle ~/.zshrc
+#+PROPERTY: header-args :tangle ~/.config/fish/config.fish
 #+auto_tangle: t
 #+STARTUP: showeverything
 
 
+* Config_Fish Shell :toc:
+#+begin_src C 
 
 set fish_greeting
 
+#+end_src
+
+cargo 
+#+begin_src C
 
 source "$HOME/.cargo/env.fish"
 
+#+end_src
+
 # name: sashimi
+#+begin_src C
+
 function fish_prompt
     set -l last_status $status
     set -l cyan (set_color -o cyan)
@@ -85,11 +95,16 @@ end
 function _is_git_dirty
     echo (command git status -s --ignore-submodules=dirty 2>/dev/null)
 end
+ 
+#+end_src
 
-# end sashimi
+end sashimi
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
+#+begin_src C
+
+
 if test -f /home/to/miniconda3/bin/conda
     eval /home/to/miniconda3/bin/conda "shell.fish" hook $argv | source
 else
@@ -99,11 +114,31 @@ else
         set -x PATH /home/to/miniconda3/bin $PATH
     end
 end
+#+end_src
+
 # <<< conda initialize <<<
+emacs
+
+#+begin_src C
 
 export PATH="$HOME/.config/emacs/bin:$PATH"
 
+#+end_src
 
+zellij
+
+#+begin_src C
 alias ze=zellij
-#
+#+end_src
+zoxide
+
+#+begin_src C
+
 zoxide init fish | source
+
+#+end_src
+
+#+begin_src C
+#neofetch
+#+end_src
+
