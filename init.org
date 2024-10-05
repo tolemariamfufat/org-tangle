@@ -16,30 +16,28 @@
     (setq byte-compile-mode t)
     (setq initial-scratch-message nil)
     (setq inhibit-startup-message t)
-   (setq inhibit-startup-echo-area-message "to")
-    ;;
 
     (if window-system
         (tool-bar-mode -1)
       )
-    ;;
+    
     (scroll-bar-mode -1)        ; Disable visible scrollbar
     (tool-bar-mode -1)          ; Disable the toolbar
     (tooltip-mode -1)           ; Disable tooltips
     (set-fringe-mode 10)        ; Give some breathing room
-  ;;
+ 
     (menu-bar-mode -1)            ; Disable the menu bar
-    ;;Set up the visible bell
-    (setq visible-bell t)
-    ;;
+    
+    (setq visible-bell t)  ;;Set up the visible bell
+
+    
     (defun fontify-frame (frame)
       (set-frame-parameter frame 'font "Monospace-11"))
-    ;;
-    ;; Fontify current fram
-    (fontify-frame nil)
-    ;; Fontify any future frames
-    (push 'fontify-frame after-make-frame-functions) 
-    ;;
+     
+    (fontify-frame nil)   ;; Fontify current fram
+    
+    (push 'fontify-frame after-make-frame-functions) ;; Fontify any future frames
+
     (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 #+end_src
