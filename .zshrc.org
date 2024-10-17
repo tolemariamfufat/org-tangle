@@ -29,7 +29,7 @@ See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 
 #+begin_src z shell
 
-ZSH_THEME="gnzh"
+ZSH_THEME="agnoster"
 
 #+end_src
 
